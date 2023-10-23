@@ -4,14 +4,13 @@
     Author: Valentin Maurer <valentin.maurer@dkfz-heidelberg>
 """
 
-library(Seurat)
-library(data.table)
-library(ggplot2)
-library(parallel)
-library(ordinal)
+required_libs = c("Seurat", "data.table", "ggplot2", "parallel", "ordinal")
+required_libs = sapply(required_libs, function(x){
+  suppressPackageStartupMessages(library(x, character.only = T))}
+)
+rm(required_libs)
 
 BASEPATH = "/omics/groups/OE0219/internal/Valentin/JMMLT/analysis/meth_rna/initPaper/lineages"
-#SEURAT_OBJECT = "/omics/odcf/analysis/OE0219_projects/JMMLC/scRNA_Data/4.All_Dataset/JMML_MNC-Postnatal_REF_Sampled/StandardAnalysis/JMML_MNC-Postnatal_REF_Sampled.Seurat.Standard.rds"
 SEURAT_OBJECT = "/omics/groups/OE0219/internal/Valentin/JMMLT/external/haematopoiesis_10x/JMML_MNC-Postnatal_REF_Sampled-Anchor.Seurat.PC1-18.rds"
 # 1:num_pcs are tested for association with metadata
 num_pcs = 15
@@ -44,12 +43,6 @@ LINEAGES = list(
          "CD34+ Eo/B/Mast"="#9356a9", "Eosinophil"="#a643d2")
 )
 
-# LINEAGE needs to be in order
-# LINEAGE = c("CD34+ HSC", "CD34+ HSC-cycle", "CD34+ MultiLin",
-#             "CD34+ MDP-2", "CD34+ MDP-1", "Pre-Dendritic", "Dendritic Cell")
-# Colors, do not need to be in order
-# DC_cols <- c("CD34+ HSC"="#252525", "CD34+ HSC-cycle"="#737373", "CD34+ MultiLin"="#b3b3b3",
-#              "CD34+ MDP-2"="#bbce7a", "CD34+ MDP-1"="#bbce5c", "Pre-Dendritic"="#94c529", "Dendritic Cell"="#5ca800")
 
 data_total = readRDS(SEURAT_OBJECT)
 data_total@meta.data$Dataset = ifelse(data_total@meta.data$Project == "JMML",
@@ -82,19 +75,15 @@ for(k in names(LINEAGES)){
 
   # Fit model predicting celltype based on expression
   models = mclapply(1:nrow(assay), function(i){
-    # model = lm(celltype ~ assay[i,])
     model = clm(celltype ~ assay[i, ])
     model_summary = summary(model)
-    # p_val = ifelse(dim(model_summary$coefficients)[1] == 1,
-                   # NA, no = model_summary$coefficients[, 4][[2]])
-    # coefficient = model$coefficients[[2]]
     p_val = model_summary$coefficients[,4][nrow(model_summary$coefficients)][[1]]
     coefficient = model_summary$coefficients[,1][nrow(model_summary$coefficients)][[1]]
-    data.table(gene = rownames(assay)[i],
-               coefficient = coefficient,
-               p_value = p_val
-               # correlation = cor(outcome, assay[i,], method = "spearman")
-               )
+    data.table(
+      gene = rownames(assay)[i],
+      coefficient = coefficient,
+      p_value = p_val
+    )
   }, mc.cores = 12)
   models = rbindlist(models)
   models[, p_adjust := p.adjust(p_value, method = "BH")]

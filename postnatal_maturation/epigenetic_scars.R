@@ -10,7 +10,7 @@ required_libs = sapply(required_libs, function(x){
   suppressPackageStartupMessages(library(x, character.only = T))}
 )
 rm(required_libs)
-source("/omics/groups/OE0219/internal/Valentin/JMMLT/scripts/accessory_funcs.R")
+source("accessory_funcs.R")
 
 tree_cols = function(data){
   pheno = readRDS(

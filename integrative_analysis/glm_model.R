@@ -4,11 +4,20 @@
     Author: Valentin Maurer <valentin.maurer@dkfz-heidelberg>
 """
 
-library(bsseq)
-library(Seurat)
-library(data.table)
-library(GenomicRanges)
-library(ComplexHeatmap)
+required_libs = c("bsseq", "Seurat", "data.table", "GenomicRanges", "ComplexHeatmap")
+required_libs = sapply(required_libs, function(x){
+  suppressPackageStartupMessages(library(x, character.only = T))}
+)
+rm(required_libs)
+
+COLORSCHEME <- c(
+  ADU = "#E5E5E5", JUV = "#A7D9CB", NEO = "#978474", FEL = "#6D7A9F", FES = "#595959",
+  P1 = "#0058b4",  P2 = "#2188c9",  P3 = "#fbbb25",  P4 = "#fca349",
+  P5 = "#ff6b36",  P6 = "#e34e2e",  P7 = "#c33126",  P8 = "#a41220"
+)
+ANNOTATION_COLORSCALE_S = colorRampPalette(rev(brewer.pal(n = 7, name ="RdYlBu")))(100)
+ANNOTATION_COLORSCALE_METH = colorRampPalette(rev(brewer.pal(n = 7, name ="RdYlBu")))(100)
+ANNOTATION_COLORSCALE_SCALED_METH = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(100)
 
 normRow = function(mat){
   t(apply(mat, MARGIN = 1, function(x){(x - min(x))/(max(x) - min(x))}))
