@@ -1,19 +1,13 @@
 library(ComplexHeatmap)
 library(circlize)
-df <- readRDS('/icgc/dkfzlsdf/analysis/OE0219_projects/JMMLC/scRNA_Result/LogisticRegression/JMML.PredictSimilarity.rds')
-meta <- readRDS('/icgc/dkfzlsdf/analysis/OE0219_projects/JMMLC/scRNA_Result/LogisticRegression/JMML.Meta.Raw.rds')
+df <- readRDS('JMML.PredictSimilarity.rds')
+meta <- readRDS('JMML.Meta.rds')
 
 # Set colors
-samplecolor = c(
-  D117 = "#0058b4",
-  D129 = "#2188c9",
-  D217 = "#fbbb25",
-  I217 = "#fca349",
-  D213 = "#ff6b36",
-  D124 = "#e34e2e",
-  D123 = "#c33126",
-  D360 = "#a41220"
-)
+samplecolor <- c(P1 = "#0058b4", P2 = "#2188c9", 
+                       P3 = "#fbbb25", P4 = "#fca349", 
+                       P5 = "#ff6b36", P6 = "#e34e2e", 
+                       P7 = "#c33126", P8 = "#a41220")
 samplecolorlist <- list(Sample = samplecolor)
 col_fun <- colorRamp2(c(0, 0.5, 1), c('#e7e1ef', '#ffffff', '#dd1c77'))
 

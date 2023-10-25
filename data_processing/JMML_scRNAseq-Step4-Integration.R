@@ -2,6 +2,7 @@
 library(Seurat)
 
 # Finding anchors
+# tempSeurat is merged Seurat object from JMML and Healthy references scRNAseq datasets
 DefaultAssay(tempSeurat) <- 'RNA'
 seulist <- SplitObject(tempSeurat, split.by = "Dataset")
 for (i in 1:length(seulist)) {
@@ -9,9 +10,8 @@ for (i in 1:length(seulist)) {
   seulist[[i]] <- FindVariableFeatures(seulist[[i]])
 }
 anchors <- FindIntegrationAnchors(seulist, dims = 1:30)
-intSeu <- IntegrateData(anchorset = anchors, dims = 1:30)
-DefaultAssay(intSeu) <- "integrated"
-tempSeurat <- intSeu
+tempSeurat <- IntegrateData(anchorset = anchors, dims = 1:30)
+DefaultAssay(tempSeurat) <- "integrated"
 
 # Data processing
 tempSeurat <-
